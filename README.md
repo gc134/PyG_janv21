@@ -2,7 +2,7 @@
 
 * outil PyG : outil de traitement des données brutes de germination avec interface graphique
 * outils : Python3 + PyQt5
-* dépôt github pour stocker les derniers dev sur l'interface pour données de germination
+* dépôt github pour stocker les derniers dev sur l'interface
 
 ## branches
 * branche master contient l'ensemble des dossiers-fichiers la version fonctionnelle de janvier 2021
