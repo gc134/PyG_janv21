@@ -1,0 +1,16 @@
+Contrast;A;B;Paired;Parametric;T;dof;Tail;p-unc;p-corr;p-adjust;BF10;hedges
+groupe;NP;HP;False;True;0.60815;6.0;two-sided;0.565383;0.652365;fdr_bh;0.584;0.373936
+groupe;NP;V1;False;True;0.176434;6.0;two-sided;0.865758;0.865758;fdr_bh;0.528;0.108485
+groupe;NP;V2;False;True;4.189015;6.0;two-sided;0.005756;0.029451;fdr_bh;7.494;2.575723
+groupe;NP;V3;False;True;-0.688356;6.0;two-sided;0.516945;0.647441;fdr_bh;0.602;-0.423253
+groupe;NP;V4;False;True;1.034563;6.0;two-sided;0.340759;0.611873;fdr_bh;0.708;0.636127
+groupe;HP;V1;False;True;-0.44431;6.0;two-sided;0.672395;0.720423;fdr_bh;0.555;-0.273196
+groupe;HP;V2;False;True;3.914279;6.0;two-sided;0.007854;0.029451;fdr_bh;6.084;2.406794
+groupe;HP;V3;False;True;-1.336098;6.0;two-sided;0.229958;0.492766;fdr_bh;0.846;-0.821534
+groupe;HP;V4;False;True;0.686638;6.0;two-sided;0.517953;0.647441;fdr_bh;0.601;0.422197
+groupe;V1;V2;False;True;4.131651;6.0;two-sided;0.006136;0.029451;fdr_bh;7.177;2.540451
+groupe;V1;V3;False;True;-0.88963;6.0;two-sided;0.407915;0.611873;fdr_bh;0.657;-0.547012
+groupe;V1;V4;False;True;0.940119;6.0;two-sided;0.383446;0.611873;fdr_bh;0.674;0.578056
+groupe;V2;V3;False;True;-4.581131;6.0;two-sided;0.003766;0.029451;fdr_bh;10.02;-2.816825
+groupe;V2;V4;False;True;-2.667205;6.0;two-sided;0.037165;0.111495;fdr_bh;2.281;-1.639999
+groupe;V3;V4;False;True;1.457854;6.0;two-sided;0.195152;0.487879;fdr_bh;0.916;0.896399
