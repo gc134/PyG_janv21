@@ -44,4 +44,5 @@ QGraphicsView#graphicsView1_page4{
     margin-left: auto;
 }
 
+
 """

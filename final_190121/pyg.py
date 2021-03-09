@@ -53,6 +53,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def on_pushButton_1_clicked(self):
         self.stackedWidget.setCurrentIndex(0)
 
+
     @pyqtSlot()
     def on_pushButton_2_clicked(self):
         self.stackedWidget.setCurrentIndex(1)
@@ -130,11 +131,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         model_pourcentage = TableModel(self.data4)
         self.tableView_page2.setModel(model_pourcentage)
 
-        #création très artificielle de la série temporelle : trouver une solution pour l'extraire auto des donnés brutes
+        # extraction de la série temporelle d'observations à partir des entêtes de colonnes
 
-        self.ts=[0,8,24,26,28,30,32,34,50,54]
+        self.ts = list(map(float, list(self.data2.columns)))
 
-    # méthode d'export d'un tableau affiché dans une TableView
 
     @pyqtSlot()
     def on_export_page2_clicked(self):
@@ -332,13 +332,18 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.Gmax, self.t50, self.AUC = round(self.fittedParameters[0], 2), round(self.fittedParameters[2], 2), round(
                 self.res_integrale, 2)
 
-            self.valeurs_parametres = [self.Gmax, self.t50, self.AUC]
+            self.lag = round(np.power(((-self.fittedParameters[3]*np.power(self.fittedParameters[2],self.fittedParameters[1]))\
+                                 /(self.fittedParameters[0]+self.fittedParameters[3])),1/self.fittedParameters[1]),2)
+
+            self.D = round(self.t50 - self.lag,2)
+
+            self.valeurs_parametres = [self.Gmax, self.lag, self.t50, self.D, self.AUC]
 
             self.valeurs_parametres = pd.DataFrame(self.valeurs_parametres).transpose()
 
             self.data6 = self.data6.append(self.valeurs_parametres, ignore_index=True)
 
-        self.data6.columns = ['Gmax', 't50', 'AUC']
+        self.data6.columns = ['Gmax','lag','t50', 'D', 'AUC']
 
         self.data6 = pd.concat([self.data['echantillon'],self.data["groupe"],self.data6],axis=1)
 
@@ -360,7 +365,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         self.data6_mean.insert(0, 'groupe', self.data['groupe'].unique().tolist())
 
-        self.data6_mean.columns = ['groupe', 'Gmax', 't50', 'AUC']
+        self.data6_mean.columns = ['groupe', 'Gmax','lag','t50', 'D', 'AUC']
 
         self.model_germination_groupe = TableModel(self.data6_mean)
         self.tableView_page4.setModel(self.model_germination_groupe)
@@ -418,6 +423,20 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                                                                          transformMode=QtCore.Qt.SmoothTransformation)
                 self.label_page5.setPixmap(self.image_image_Gmax_2)
 
+            elif self.comboBox_page5.currentText() == "lag":
+                boxplot = sns.boxplot(x='groupe', y='lag', data=self.data7, palette="Set1", linewidth=1,
+                                      saturation=2)
+                plt.title(self.titre_boxplot_germination)
+                plt.ylabel(self.comboBox_page5.currentText())
+                plt.show()
+                plt.figure()
+                boxplot.get_figure().savefig("boxplot_lag.tiff")
+
+                self.image_boxplot_lag = QPixmap("boxplot_lag.tiff")
+                self.image_image_lag_2 = self.image_boxplot_lag.scaled(471, 431, Qt.KeepAspectRatio,
+                                                                         transformMode=QtCore.Qt.SmoothTransformation)
+                self.label_page5.setPixmap(self.image_image_lag_2)
+
 
             elif self.comboBox_page5.currentText() == "t50":
 
@@ -434,6 +453,20 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 self.image_image_t50_2 = self.image_boxplot_t50.scaled(471, 431, Qt.KeepAspectRatio,
                                                                        transformMode=QtCore.Qt.SmoothTransformation)
                 self.label_page5.setPixmap(self.image_image_t50_2)
+
+            elif self.comboBox_page5.currentText() == "D":
+                boxplot = sns.boxplot(x='groupe', y='D', data=self.data7, palette="Set1", linewidth=1,
+                                      saturation=2)
+                plt.title(self.titre_boxplot_germination)
+                plt.ylabel(self.comboBox_page5.currentText())
+                plt.show()
+                plt.figure()
+                boxplot.get_figure().savefig("boxplot_D.tiff")
+
+                self.image_boxplot_D = QPixmap("boxplot_D.tiff")
+                self.image_image_D_2 = self.image_boxplot_D.scaled(471, 431, Qt.KeepAspectRatio,
+                                                                         transformMode=QtCore.Qt.SmoothTransformation)
+                self.label_page5.setPixmap(self.image_image_D_2)
 
             elif self.comboBox_page5.currentText() == "AUC":
 
@@ -461,9 +494,17 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.aov_res_Gmax = pd.DataFrame(aov.T).transpose()
         self.model_anova_Gmax = TableModel(self.aov_res_Gmax)
 
+        aov = pg.anova(data=self.data8, dv='lag', between='groupe', detailed=True).round(6)
+        self.aov_res_lag = pd.DataFrame(aov.T).transpose()
+        self.model_anova_lag = TableModel(self.aov_res_lag)
+
         aov = pg.anova(data=self.data8, dv='t50', between='groupe', detailed=True).round(6)
         self.aov_res_t50 = pd.DataFrame(aov.T).transpose()
         self.model_anova_t50 = TableModel(self.aov_res_t50)
+
+        aov = pg.anova(data=self.data8, dv='D', between='groupe', detailed=True).round(6)
+        self.aov_res_D = pd.DataFrame(aov.T).transpose()
+        self.model_anova_D = TableModel(self.aov_res_D)
 
         aov = pg.anova(data=self.data8, dv='AUC', between='groupe', detailed=True).round(6)
         self.aov_res_AUC = pd.DataFrame(aov.T).transpose()
@@ -474,16 +515,28 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.posthoc_res_Gmax = pd.DataFrame(posthoc.T).transpose()
         self.model_multcomp_Gmax = TableModel(self.posthoc_res_Gmax)
 
+        posthoc = pg.pairwise_ttests(data=self.data8, dv='lag', between='groupe', parametric=True, padjust='fdr_bh',
+                                     effsize='hedges').round(6)
+        self.posthoc_res_lag = pd.DataFrame(posthoc.T).transpose()
+        self.model_multcomp_lag = TableModel(self.posthoc_res_lag)
+
         posthoc = pg.pairwise_ttests(data=self.data8, dv='t50', between='groupe', parametric=True, padjust='fdr_bh',
                                      effsize='hedges').round(6)
         self.posthoc_res_t50 = pd.DataFrame(posthoc.T).transpose()
         self.model_multcomp_t50 = TableModel(self.posthoc_res_t50)
         self.tableView_page6.setModel(self.model_multcomp_t50)
 
+        posthoc = pg.pairwise_ttests(data=self.data8, dv='D', between='groupe', parametric=True, padjust='fdr_bh',
+                                     effsize='hedges').round(6)
+        self.posthoc_res_D = pd.DataFrame(posthoc.T).transpose()
+        self.model_multcomp_D = TableModel(self.posthoc_res_D)
+        self.tableView_page6.setModel(self.model_multcomp_D)
+
         posthoc = pg.pairwise_ttests(data=self.data8, dv='AUC', between='groupe', parametric=True, padjust='fdr_bh',
                                      effsize='hedges').round(6)
         self.posthoc_res_AUC = pd.DataFrame(posthoc.T).transpose()
         self.model_multcomp_AUC = TableModel(self.posthoc_res_AUC)
+        self.tableView_page6.setModel(self.model_multcomp_AUC)
 
         if self.comboBox_page6.currentText() == "Gmax":
 
@@ -492,12 +545,26 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.model_anova_Gmax = TableModel(self.aov_res_Gmax)
             self.tableView_page6.setModel(self.model_anova_Gmax)
 
+        elif self.comboBox_page6.currentText() == "lag":
+
+            aov = pg.anova(data=self.data8, dv='lag', between='groupe', detailed=True).round(6)
+            self.aov_res_lag = pd.DataFrame(aov.T).transpose()
+            self.model_anova_lag = TableModel(self.aov_res_lag)
+            self.tableView_page6.setModel(self.model_anova_lag)
+
         elif self.comboBox_page6.currentText() == "t50":
 
             aov = pg.anova(data=self.data8, dv='t50', between='groupe', detailed=True).round(6)
             self.aov_res_t50 = pd.DataFrame(aov.T).transpose()
             self.model_anova_t50 = TableModel(self.aov_res_t50)
             self.tableView_page6.setModel(self.model_anova_t50)
+
+        elif self.comboBox_page6.currentText() == "D":
+
+            aov = pg.anova(data=self.data8, dv='D', between='groupe', detailed=True).round(6)
+            self.aov_res_D = pd.DataFrame(aov.T).transpose()
+            self.model_anova_D = TableModel(self.aov_res_D)
+            self.tableView_page6.setModel(self.model_anova_D)
 
         else:
 
@@ -509,15 +576,23 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     @pyqtSlot()
     def on_multcomp_page6_clicked(self):
 
-        self.data8 = self.data7.drop(labels="echantillon",axis=1)
+        self.data8 = self.data7.drop(labels='echantillon', axis=1)
 
         aov = pg.anova(data=self.data8, dv='Gmax', between='groupe', detailed=True).round(6)
         self.aov_res_Gmax = pd.DataFrame(aov.T).transpose()
         self.model_anova_Gmax = TableModel(self.aov_res_Gmax)
 
+        aov = pg.anova(data=self.data8, dv='lag', between='groupe', detailed=True).round(6)
+        self.aov_res_lad = pd.DataFrame(aov.T).transpose()
+        self.model_anova_lag = TableModel(self.aov_res_lag)
+
         aov = pg.anova(data=self.data8, dv='t50', between='groupe', detailed=True).round(6)
         self.aov_res_t50 = pd.DataFrame(aov.T).transpose()
         self.model_anova_t50 = TableModel(self.aov_res_t50)
+
+        aov = pg.anova(data=self.data8, dv='D', between='groupe', detailed=True).round(6)
+        self.aov_res_D = pd.DataFrame(aov.T).transpose()
+        self.model_anova_D = TableModel(self.aov_res_D)
 
         aov = pg.anova(data=self.data8, dv='AUC', between='groupe', detailed=True).round(6)
         self.aov_res_AUC = pd.DataFrame(aov.T).transpose()
@@ -528,16 +603,28 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.posthoc_res_Gmax = pd.DataFrame(posthoc.T).transpose()
         self.model_multcomp_Gmax = TableModel(self.posthoc_res_Gmax)
 
+        posthoc = pg.pairwise_ttests(data=self.data8, dv='lag', between='groupe', parametric=True, padjust='fdr_bh',
+                                     effsize='hedges').round(6)
+        self.posthoc_res_lag = pd.DataFrame(posthoc.T).transpose()
+        self.model_multcomp_lag = TableModel(self.posthoc_res_lag)
+
         posthoc = pg.pairwise_ttests(data=self.data8, dv='t50', between='groupe', parametric=True, padjust='fdr_bh',
                                      effsize='hedges').round(6)
         self.posthoc_res_t50 = pd.DataFrame(posthoc.T).transpose()
         self.model_multcomp_t50 = TableModel(self.posthoc_res_t50)
         self.tableView_page6.setModel(self.model_multcomp_t50)
 
+        posthoc = pg.pairwise_ttests(data=self.data8, dv='D', between='groupe', parametric=True, padjust='fdr_bh',
+                                     effsize='hedges').round(6)
+        self.posthoc_res_D = pd.DataFrame(posthoc.T).transpose()
+        self.model_multcomp_D = TableModel(self.posthoc_res_D)
+        self.tableView_page6.setModel(self.model_multcomp_D)
+
         posthoc = pg.pairwise_ttests(data=self.data8, dv='AUC', between='groupe', parametric=True, padjust='fdr_bh',
                                      effsize='hedges').round(6)
         self.posthoc_res_AUC = pd.DataFrame(posthoc.T).transpose()
         self.model_multcomp_AUC = TableModel(self.posthoc_res_AUC)
+        self.tableView_page6.setModel(self.model_multcomp_AUC)
 
         if self.comboBox_page6.currentText() == "Gmax":
 
@@ -546,12 +633,28 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.model_multcomp_Gmax = TableModel(self.posthoc_res_Gmax)
             self.tableView_page6.setModel(self.model_multcomp_Gmax)
 
+        elif self.comboBox_page6.currentText() == "lag":
+
+            posthoc = pg.pairwise_ttests(data=self.data8, dv='lag', between='groupe', parametric=True, padjust='fdr_bh',effsize='hedges').round(6)
+            self.posthoc_res_lag = pd.DataFrame(posthoc.T).transpose()
+            self.model_multcomp_lag = TableModel(self.posthoc_res_lag)
+            self.tableView_page6.setModel(self.model_multcomp_lag)
+            # self.tableView_page6.resizeColumnsToContents()
+
         elif self.comboBox_page6.currentText() == "t50":
 
             posthoc = pg.pairwise_ttests(data=self.data8, dv='t50', between='groupe', parametric=True, padjust='fdr_bh',effsize='hedges').round(6)
             self.posthoc_res_t50 = pd.DataFrame(posthoc.T).transpose()
             self.model_multcomp_t50 = TableModel(self.posthoc_res_t50)
             self.tableView_page6.setModel(self.model_multcomp_t50)
+            # self.tableView_page6.resizeColumnsToContents()
+
+        elif self.comboBox_page6.currentText() == "D":
+
+            posthoc = pg.pairwise_ttests(data=self.data8, dv='D', between='groupe', parametric=True, padjust='fdr_bh',effsize='hedges').round(6)
+            self.posthoc_res_D = pd.DataFrame(posthoc.T).transpose()
+            self.model_multcomp_D = TableModel(self.posthoc_res_D)
+            self.tableView_page6.setModel(self.model_multcomp_D)
             # self.tableView_page6.resizeColumnsToContents()
 
         else:
@@ -569,10 +672,14 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if self.tableView_page6.model() is self.model_anova_Gmax :
             self.aov_res_Gmax.to_csv("tableau_anova_Gmax.csv", sep=";", decimal=".", index=False)
 
+        if self.tableView_page6.model() is self.model_anova_lag :
+            self.aov_res_lag.to_csv("tableau_anova_lag.csv", sep=";", decimal=".", index=False)
 
         elif self.tableView_page6.model() is self.model_anova_t50:
             self.aov_res_t50.to_csv("tableau_anova_t50.csv", sep=";", decimal=".", index=False)
 
+        elif self.tableView_page6.model() is self.model_anova_D:
+            self.aov_res_D.to_csv("tableau_anova_D.csv", sep=";", decimal=".", index=False)
 
         elif self.tableView_page6.model() is self.model_anova_AUC:
             self.aov_res_AUC.to_csv("tableau_anova_AUC.csv", sep=";", decimal=".", index=False)
@@ -581,11 +688,14 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         elif self.tableView_page6.model() is self.model_multcomp_Gmax:
             self.posthoc_res_Gmax.to_csv("tableau_multcomp_Gmax.csv", sep=";", decimal=".", index=False)
 
-
+        elif self.tableView_page6.model() is self.model_multcomp_lag:
+            self.posthoc_res_lag.to_csv("tableau_multcomp_lag.csv", sep=";", decimal=".", index=False)
 
         elif self.tableView_page6.model() is self.model_multcomp_t50:
             self.posthoc_res_t50.to_csv("tableau_multcomp_t50.csv", sep=";", decimal=".", index=False)
 
+        elif self.tableView_page6.model() is self.model_multcomp_D:
+            self.posthoc_res_D.to_csv("tableau_multcomp_D.csv", sep=";", decimal=".", index=False)
 
         else:
             self.posthoc_res_AUC.to_csv("tableau_multcomp_AUC.csv", sep=";", decimal=".", index=False)
