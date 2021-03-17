@@ -144,6 +144,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_11.addItem(spacerItem13)
         self.tableView_page1 = QtWidgets.QTableView(self.page)
         self.tableView_page1.setObjectName("tableView_page1")
+        self.tableView_page1.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
         self.verticalLayout_11.addWidget(self.tableView_page1)
         spacerItem14 = QtWidgets.QSpacerItem(20, 100, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.verticalLayout_11.addItem(spacerItem14)
@@ -944,31 +945,31 @@ class Ui_MainWindow(object):
         self.titre_page3.setText(_translate("MainWindow", "Courbes de germination"))
         self.label1_page3.setText(_translate("MainWindow", ""))
         self.label2_page3.setText(_translate("MainWindow", ""))
-        self.label1_page4.setText(_translate("MainWindow", "a"))
+        self.label1_page4.setText(_translate("MainWindow", "A\nGmax"))
         self.textEdit1_page4.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'SimSun\'; font-size:14pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">70</p></body></html>"))
-        self.label2_page4.setText(_translate("MainWindow", "b"))
+        self.label2_page4.setText(_translate("MainWindow", "B\nallure"))
         self.textEdit2_page4.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'SimSun\'; font-size:14pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">20</p></body></html>"))
-        self.label3_page4.setText(_translate("MainWindow", "c"))
+        self.label3_page4.setText(_translate("MainWindow", "C\nt50"))
         self.textEdit3_page4.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'SimSun\'; font-size:14pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">30</p></body></html>"))
-        self.label4_page4.setText(_translate("MainWindow", "yo"))
+        self.label4_page4.setText(_translate("MainWindow", "Y0\nordonnée t0"))
         self.textEdit4_page4.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'SimSun\'; font-size:14pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">0</p></body></html>"))
-        self.label5_page4.setText(_translate("MainWindow", "intervalle"))
+        self.label5_page4.setText(_translate("MainWindow", "plage\ntemps"))
         self.textEdit5_page4.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"

@@ -57,7 +57,19 @@ class TableModel(QtCore.QAbstractTableModel):
 
             if isinstance(value, str):
 
-                return QtGui.QColor("lightblue")
+                return QtGui.QColor("YellowGreen")
+
+            elif isinstance(value, float):
+
+                return QtGui.QColor("Gold")
+
+            else :
+
+                return QtGui.QColor("Gold")
+
+
+
+
 
 
     def rowCount(self, index):

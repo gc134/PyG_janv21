@@ -36,7 +36,7 @@ app.setStyle('Fusion')
 
 from pygui_v2 import Ui_MainWindow
 from DataFrameModel_v2 import TableModel
-from styleSheet import styleSheet
+from styleSheet_dark_orange import styleSheet
 
 
 class MyMainWindow(QMainWindow, Ui_MainWindow):
@@ -160,7 +160,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             curves += plt.plot(x, y)
 
 
-        # plt.pause(0.001)
         plt.title(self.titre1_page3)
         plt.xlabel("temps (heures)")
         plt.ylabel("% germination")
