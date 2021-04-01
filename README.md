@@ -22,3 +22,11 @@
 * modification du highlight au survol souris de certains objets actifs
 * tentative d'alignement droit ou centré sur les zones de saisie ou sur comboBox (liste déroulante) au niveau du stylesheet : échec !!!
 * nouvelle apparence qui paraît abouti : plus gd chose à faire au niveau forme (couleurs, comportements...)
+
+## 01/04/21
+
+* code pyg.py optimisé = simplifié
+* au niveau de la classe "MyMainWindow"
+* nx noms pour attributs
+* définitions des méthodes allégées (suppresion de tests)
+* définition de fonctions génériques, appelées à plusieurs niveau
