@@ -104,10 +104,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.label_page1.setText(self.file_name)
         self.update()
 
-        self.data = pd.read_csv(self.file_name, sep=";")
+        self.df_raw = pd.read_csv(self.file_name, sep=";")
 
-        model_brut = TableModel(self.data)
-        self.tableView_page1.setModel(model_brut)
+        model_df_raw = TableModel(self.df_raw)
+        self.tableView_page1.setModel(model_df_raw)
 
 #2_p
 
@@ -116,32 +116,32 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     @pyqtSlot()
     def on_calcul_page2_clicked(self):
 
-        self.data2 = self.data.drop(['echantillon', 'groupe', 'total'], 1)
+        self.df_count = self.df_raw.drop(['echantillon', 'groupe', 'total'], 1)
 
-        self.total= self.data['total']
+        self.total= self.df_raw['total']
 
-        self.data3 = pd.DataFrame()
+        self.df_percent = pd.DataFrame()
 
-        for i in range(0, self.data2.shape[0]):
-            vec = self.data2.iloc[i, :]
-            vec2 = round((vec / self.total[i]) * 100, 1)
-            vec2 = pd.DataFrame(vec2).transpose()
-            self.data3 = pd.concat([self.data3, vec2])
+        for i in range(0, self.df_count.shape[0]):
+            vec = self.df_count.iloc[i, :]
+            vec = round((vec / self.total[i]) * 100, 1)
+            vec = pd.DataFrame(vec).transpose()
+            self.df_percent = pd.concat([self.df_percent, vec])
 
-        self.data4 = pd.concat([self.data[["echantillon","groupe"]],self.data3], axis=1)
+        self.df_percent_final = pd.concat([self.df_raw[["echantillon","groupe"]],self.df_percent], axis=1)
 
-        model_pourcentage = TableModel(self.data4)
-        self.tableView_page2.setModel(model_pourcentage)
+        model_df_percent_final = TableModel(self.df_percent_final)
+        self.tableView_page2.setModel(model_df_percent_final)
 
         # extraction de la série temporelle d'observations à partir des entêtes de colonnes
 
-        self.ts = list(map(float, list(self.data2.columns)))
+        self.time_serie = list(map(float, list(self.df_count.columns)))
 
 
     @pyqtSlot()
     def on_export_page2_clicked(self):
 
-        self.data4.to_csv("tableau_pourcentages.csv", sep=";", decimal=".", index=False)
+        self.df_percent_final.to_csv("tableau_pourcentages.csv", sep=";", decimal=".", index=False)
 
     # méthode de génération des courbes de germination individuelles
 
@@ -150,69 +150,62 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     @pyqtSlot()
     def on_courbe_ind_page3_clicked(self):
 
-        self.titre1_page3 = self.textEdit1_page3.toPlainText()
-
         curves=[]
 
-        for i in range(0, self.data3.transpose().shape[1]):
-            x = np.array(self.ts)
-            y = self.data3.transpose().iloc[:, i]
+        for i in range(0, self.df_percent.transpose().shape[1]):
+            x = np.array(self.time_serie)
+            y = self.df_percent.transpose().iloc[:, i]
             curves += plt.plot(x, y)
 
-
-        plt.title(self.titre1_page3)
-        plt.xlabel("temps (heures)")
+        plt.title(self.textEdit1_page3.toPlainText())
+        plt.xlabel("temps")
         plt.ylabel("% germination")
-        plt.legend(curves, self.data4['echantillon'], loc=0)
-        plt.savefig("courbes_ind.tiff")
-
+        plt.legend(curves, self.df_percent_final['echantillon'], loc=0)
+        plt.savefig("courbes_germ_indiv.tiff")
         plt.show()
         plt.figure()
 
-        self.image_courbe_ind = QPixmap("courbes_ind.tiff")
-        self.image_courbe_ind_2 = self.image_courbe_ind.scaled(450, 500, Qt.KeepAspectRatio, transformMode=QtCore.Qt.SmoothTransformation)
-        self.label1_page3.setPixmap(self.image_courbe_ind_2)
+        self.image_indiv_curves = QPixmap("courbes_germ_indiv.tiff")
+        self.image_indiv_curves = self.image_indiv_curves.scaled(450, 500, Qt.KeepAspectRatio, transformMode=QtCore.Qt.SmoothTransformation)
+        self.label1_page3.setPixmap(self.image_indiv_curves)
 
     # méthode de génération de courbes de germination groupées
 
     @pyqtSlot()
     def on_courbe_groupe_page3_clicked(self):
 
-        self.titre2_page3 = self.textEdit2_page3.toPlainText()
+        self.df_percent_mean = pd.DataFrame()
 
-        self.data4_mean = pd.DataFrame()
-
-        for name in self.data4.columns[2:]:
-            vec = self.data4.groupby('groupe')[name].mean().values
+        for name in self.df_percent_final.columns[2:]:
+            vec = self.df_percent_final.groupby('groupe')[name].mean().values
             vec = pd.DataFrame(vec)
-            self.data4_mean = pd.concat([self.data4_mean, vec], axis=1, ignore_index=True)
+            self.df_percent_mean = pd.concat([self.df_percent_mean, vec], axis=1, ignore_index=True)
 
-        self.data4_sd = pd.DataFrame()
+        self.df_percent_sd = pd.DataFrame()
 
-        for name in self.data4.columns[2:]:
-            vec = self.data4.groupby('groupe')[name].std().values
+        for name in self.df_percent_final.columns[2:]:
+            vec = self.df_percent_final.groupby('groupe')[name].std().values
             vec = pd.DataFrame(vec)
-            self.data4_sd = pd.concat([self.data4_sd, vec], axis=1, ignore_index=True)
+            self.df_percent_sd = pd.concat([self.df_percent_sd, vec], axis=1, ignore_index=True)
 
         curves=[]
 
-        for i in range(0, self.data4_mean.shape[0]):
-            texte_legend_groupe=self.data4['groupe'].unique().tolist()[i]
-            curves += plt.errorbar(np.array(self.ts), self.data4_mean.iloc[i, :], self.data4_sd.iloc[i, :], linestyle='solid',
-                                   marker='.', label="{}".format(texte_legend_groupe))
-        # plt.pause(0.001)
-        plt.title(self.titre2_page3)
-        plt.xlabel("temps (heures)")
+        for i in range(0, self.df_percent_mean.shape[0]):
+            legend_text = self.df_percent_final['groupe'].unique().tolist()[i]
+            curves += plt.errorbar(np.array(self.time_serie), self.df_percent_mean.iloc[i, :], self.df_percent_sd.iloc[i, :], linestyle='solid',
+                                   marker='.', label="{}".format(legend_text))
+
+        plt.title(self.textEdit2_page3.toPlainText())
+        plt.xlabel("temps")
         plt.ylabel("% germination")
         plt.legend(loc=0)
-        plt.savefig("courbes_groupe.tiff")
-
+        plt.savefig("courbes_germ_groupes.tiff")
         plt.show()
         plt.figure()
 
-        self.image_courbe_groupe = QPixmap("courbes_groupe.tiff")
-        self.image_courbe_groupe_2 = self.image_courbe_groupe.scaled(450, 500, Qt.KeepAspectRatio, transformMode=QtCore.Qt.SmoothTransformation)
-        self.label2_page3.setPixmap(self.image_courbe_groupe_2)
+        self.image_group_curves = QPixmap("courbes_germ_groupes.tiff")
+        self.image_group_curves = self.image_group_curves.scaled(450, 500, Qt.KeepAspectRatio, transformMode=QtCore.Qt.SmoothTransformation)
+        self.label2_page3.setPixmap(self.image_group_curves)
 
 #4_p
 
